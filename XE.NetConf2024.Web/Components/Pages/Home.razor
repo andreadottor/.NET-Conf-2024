@@ -1,0 +1,24 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<hr />
+
+<h3>@RendererInfo.Name</h3>
+
+@if(!RendererInfo.IsInteractive)
+{
+    <p>Rendering static server-side</p>
+}
+else if(AssignedRenderMode == RenderMode.InteractiveServer)
+{
+    <p>Interactive server</p>
+}
+else if(AssignedRenderMode == RenderMode.InteractiveWebAssembly)
+{
+    <p>Interactive WebAssembly</p>
+}
