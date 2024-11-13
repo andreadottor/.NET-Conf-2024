@@ -53,6 +53,11 @@ app.MapGet("/weatherforecast", () =>
 
 app.MapDefaultEndpoints();
 
+//if(app.Environment.IsDevelopment())
+//{
+//    app.MapGet("/", () => Results.LocalRedirect("/swagger"));
+//}
+
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
