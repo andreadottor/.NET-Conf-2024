@@ -1,4 +1,7 @@
+using Microsoft.OpenApi.Any;
 using Scalar.AspNetCore;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +16,23 @@ builder.Services.AddOpenApi(options =>
 {
     options.AddDocumentTransformer((document, context, cancellationToken) =>
     {
+        // HACK: Remove the servers from the document because the app run in a container.
         document.Servers.Clear();
+        return Task.CompletedTask;
+    });
+
+    options.AddSchemaTransformer((schema, context, cancellationToken) =>
+    {
+        if (context.JsonTypeInfo.Type == typeof(Todo))
+        {
+            schema.Example = new OpenApiObject
+            {
+                ["id"] = new OpenApiInteger(1),
+                ["title"] = new OpenApiString("A sample title"),
+                ["description"] = new OpenApiString("A long description"),
+                ["createdOn"] = new OpenApiDateTime(DateTime.Now)
+            };
+        }
         return Task.CompletedTask;
     });
 });
@@ -25,13 +44,16 @@ app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
+    // GET /openapi/v1.json
     app.MapOpenApi();
 
+    // GET /swagger
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/openapi/v1.json", "v1");
     });
 
+    // GET /scalar/v1
     app.MapScalarApiReference();
 }
 
@@ -51,6 +73,8 @@ app.MapGet("/weatherforecast", () =>
 })
 .WithName("GetWeatherForecast");
 
+app.MapPost("/todos", (Todo todo) => { });
+
 app.MapDefaultEndpoints();
 
 //if(app.Environment.IsDevelopment())
@@ -63,4 +87,14 @@ app.Run();
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+}
+
+record Todo
+{
+    public int Id { get; init; }
+    public required string Title { get; init; }
+    [DefaultValue("A new todo")]
+    public required string Description { get; init; }
+    [Required]
+    public DateTime CreatedOn { get; init; }
 }

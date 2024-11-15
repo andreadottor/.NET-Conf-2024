@@ -27,10 +27,63 @@
           }
         }
       }
+    },
+    "/todos": {
+      "post": {
+        "tags": [
+          "XE.NetConf2024.ApiService"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Todo"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "Todo": {
+        "required": [
+          "title",
+          "description",
+          "createdOn"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "default": "A new todo"
+          },
+          "createdOn": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "example": {
+          "id": 1,
+          "title": "A sample title",
+          "description": "A long description",
+          "createdOn": "2024-11-15T18:25:31.7485130+01:00"
+        }
+      },
       "WeatherForecast": {
         "required": [
           "date",
